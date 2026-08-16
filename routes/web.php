@@ -3,6 +3,7 @@
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AttendanceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,4 +23,5 @@ require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
     Route::resource('employees', EmployeeController::class);
+    Route::resource('attendances', AttendanceController::class);
 });
