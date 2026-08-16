@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::middleware(['auth', 'role:admin'])->get('/admin-only', function () {
-    return 'Welcome Admin! This page is only for admins.';
+Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
+    Route::resource('employees', EmployeeController::class);
 });
