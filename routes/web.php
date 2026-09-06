@@ -4,6 +4,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LeaveController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,4 +25,7 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::resource('attendances', AttendanceController::class);
+    Route::resource('leaves', LeaveController::class);
+    Route::patch('/leaves/{leave}/approve', [LeaveController::class, 'approve'])->name('leaves.approve');
+    Route::patch('/leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('leaves.reject');
 });
