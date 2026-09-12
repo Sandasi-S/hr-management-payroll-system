@@ -76,12 +76,14 @@
                                         </form>
                                     @endif
 
-                                    <a href="{{ route('leaves.edit', $leave) }}" class="text-yellow-600 hover:underline">Edit</a>
-                                    <form action="{{ route('leaves.destroy', $leave) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
-                                    </form>
+                                    @if ($leave->status === 'pending')
+                                        <a href="{{ route('leaves.edit', $leave) }}" class="text-yellow-600 hover:underline">Edit</a>
+                                        <form action="{{ route('leaves.destroy', $leave) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

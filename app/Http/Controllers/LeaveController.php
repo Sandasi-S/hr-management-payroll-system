@@ -31,19 +31,36 @@ class LeaveController extends Controller
      * Store a newly created leave request.
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'leave_type' => 'required|in:sick,annual,casual',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'reason' => 'nullable|string',
-        ]);
+{
+    $validated = $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'leave_type' => 'required|in:sick,annual,casual',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'reason' => 'nullable|string',
+    ]);
 
-        // Status is always 'pending' when first created
-        $validated['status'] = 'pending';
+    // Prevent overlapping leave requests for the same employee
+    $overlapping = Leave::where('employee_id', $validated['employee_id'])
+                         ->whereIn('status', ['pending', 'approved'])
+                         ->where(function ($query) use ($validated) {
+                             $query->whereBetween('start_date', [$validated['start_date'], $validated['end_date']])
+                                   ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
+                                   ->orWhere(function ($q) use ($validated) {
+                                       $q->where('start_date', '<=', $validated['start_date'])
+                                         ->where('end_date', '>=', $validated['end_date']);
+                                   });
+                         })
+                         ->exists();
 
-        Leave::create($validated);
+    if ($overlapping) {
+        return back()->withErrors(['start_date' => 'This employee already has a pending or approved leave request that overlaps with these dates.'])->withInput();
+    }
+
+    // Status is always 'pending' when first created
+    $validated['status'] = 'pending';
+
+    Leave::create($validated);
 
         return redirect()->route('leaves.index')->with('success', 'Leave request submitted successfully!');
     }
@@ -62,6 +79,10 @@ class LeaveController extends Controller
      */
     public function edit(Leave $leave)
     {
+        if ($leave->status !== 'pending') {
+            return redirect()->route('leaves.index')->with('error', 'Only pending leave requests can be edited.');
+        }
+
         $employees = Employee::with('user')->where('status', 'active')->get();
         return view('leaves.edit', compact('leave', 'employees'));
     }
