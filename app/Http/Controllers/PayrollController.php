@@ -6,6 +6,7 @@ use App\Models\Payroll;
 use App\Models\Employee;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PayrollController extends Controller
 {
@@ -134,5 +135,14 @@ class PayrollController extends Controller
         $payroll->delete();
 
         return redirect()->route('payrolls.index')->with('success', 'Payroll deleted successfully!');
+    }
+    /**
+     * Download the payslip as a PDF.
+     */
+    public function downloadPdf(Payroll $payroll)
+    {
+        $payroll->load('employee.user');
+        $pdf = Pdf::loadView('payrolls.payslip-pdf', compact('payroll'));
+        return $pdf->download('payslip-' . $payroll->employee->employee_code . '-' . $payroll->month . '.pdf');
     }
 }

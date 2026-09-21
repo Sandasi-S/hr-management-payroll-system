@@ -45,6 +45,9 @@
                 </div>
 
                 <div class="flex space-x-3">
+                    <a href="{{ route('payrolls.pdf', $payroll) }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                        Download PDF
+                    </a>
                     <a href="{{ route('payrolls.edit', $payroll) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
                         Edit
                     </a>

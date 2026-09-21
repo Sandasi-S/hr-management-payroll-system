@@ -30,4 +30,5 @@ Route::middleware(['auth', 'role:admin,hr_manager'])->group(function () {
     Route::patch('/leaves/{leave}/approve', [LeaveController::class, 'approve'])->name('leaves.approve');
     Route::patch('/leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('leaves.reject');
     Route::resource('payrolls', PayrollController::class);
+    Route::get('/payrolls/{payroll}/pdf', [PayrollController::class, 'downloadPdf'])->name('payrolls.pdf');
 });
